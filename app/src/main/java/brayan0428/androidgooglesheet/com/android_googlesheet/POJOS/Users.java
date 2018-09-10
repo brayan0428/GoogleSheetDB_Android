@@ -1,10 +1,9 @@
 package brayan0428.androidgooglesheet.com.android_googlesheet.POJOS;
 
 public class Users {
-    int Id;
-    String Names,LastNames,Address,Email,Image;
+    String Id,Names,LastNames,Address,Email,Image;
 
-    public Users(int Id,String Names,String LastNames,String Address,String Email,String Image){
+    public Users(String Id,String Names,String LastNames,String Address,String Email,String Image){
         this.Id = Id;
         this.Names = Names;
         this.LastNames = LastNames;
@@ -13,11 +12,11 @@ public class Users {
         this.Image = Image;
     }
 
-    public int getId() {
+    public String getId() {
         return Id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         Id = id;
     }
 

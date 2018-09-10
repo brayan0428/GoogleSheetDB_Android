@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import brayan0428.androidgooglesheet.com.android_googlesheet.POJOS.Users;
@@ -33,12 +35,18 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+        holder.nameUser.setText(users.get(position).getNames());
+        holder.emailUser.setText(users.get(position).getEmail());
+        Picasso.get()
+                .load(users.get(position).getImage())
+                //.placeholder(R.drawable.ic_launcher_foreground)
+                .error(R.drawable.ic_launcher_background)
+                .into(holder.imgUser);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return users.size();
     }
 
     public class ViewHolder extends  RecyclerView.ViewHolder {
@@ -47,7 +55,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         ImageView imgUser;
         public ViewHolder(View itemView) {
             super(itemView);
-            cardView = itemView.findViewById(R.id.imageUser);
+            cardView = itemView.findViewById(R.id.cardUsers);
             nameUser = itemView.findViewById(R.id.nameUser);
             emailUser = itemView.findViewById(R.id.emailUser);
             imgUser = itemView.findViewById(R.id.imageUser);
