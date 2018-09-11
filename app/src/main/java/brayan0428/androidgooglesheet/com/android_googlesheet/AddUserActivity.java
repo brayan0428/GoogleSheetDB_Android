@@ -24,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -43,6 +44,7 @@ public class AddUserActivity extends AppCompatActivity{
     EditText names,lastnames,address,email;
     Button addUser,cancelUser;
     String image = "";
+    String idUser = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +67,17 @@ public class AddUserActivity extends AppCompatActivity{
         addUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(image.toString().trim().equals("") && idUser.equals("")){
+                    mostrarMensaje("Debe seleccionar una imagen");
+                    return;
+                }
+                if(names.getText().toString().trim().equals("")){
+                    mostrarMensaje("Debe ingresar el nombre");
+                }
+                if(lastnames.getText().toString().trim().equals("")){
+                    mostrarMensaje("Debe ingresar los apellidos");
+                    return;
+                }
                 saveUser();
             }
         });
@@ -74,6 +87,23 @@ public class AddUserActivity extends AppCompatActivity{
                 Retornar();
             }
         });
+
+        //Obtengo datos para actualizar usuario
+        Bundle datos = this.getIntent().getExtras();
+        if(datos != null){
+            idUser = datos.getString("Id");
+            if (!idUser.equals("")){
+                names.setText(datos.getString("Names"));
+                lastnames.setText(datos.getString("LastNames"));
+                address.setText(datos.getString("Address"));
+                email.setText(datos.getString("Email"));
+                Picasso.get()
+                        .load(datos.getString("Image"))
+                        //.placeholder(R.drawable.ic_launcher_foreground)
+                        .error(R.drawable.ic_launcher_background)
+                        .into(imgUser);
+            }
+        }
     }
 
     private void EscogerImagen(){
@@ -127,7 +157,7 @@ public class AddUserActivity extends AppCompatActivity{
         }
     }
     private void saveUser(){
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"Insertando Usuario","Espere un momento...",false,false);
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Guardando Información","Espere un momento...",false,false);
         StringRequest postRequest = new StringRequest(Request.Method.POST, Variables.URL_API, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -147,7 +177,13 @@ public class AddUserActivity extends AppCompatActivity{
             {
                 Map<String, String>  params = new HashMap<>();
                 try {
-                    params.put(Variables.ID,Variables.stringToMD5(email.getText().toString() + names.getText().toString()));
+                    if (idUser.equals("")){
+                        params.put("action","insert");
+                        params.put(Variables.ID,Variables.stringToMD5(email.getText().toString() + names.getText().toString()));
+                    }else{
+                        params.put("action","update");
+                        params.put(Variables.ID,idUser);
+                    }
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
@@ -155,7 +191,9 @@ public class AddUserActivity extends AppCompatActivity{
                 params.put(Variables.LASTNAMES,lastnames.getText().toString());
                 params.put(Variables.ADDRESS,address.getText().toString());
                 params.put(Variables.EMAIL,email.getText().toString());
-                params.put(Variables.IMAGE,image);
+                if (idUser.equals("") || (!idUser.equals("") && !image.equals(""))){
+                    params.put(Variables.IMAGE,image);
+                }
                 return params;
             }
         };
@@ -166,5 +204,9 @@ public class AddUserActivity extends AppCompatActivity{
         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void mostrarMensaje(String msn){
+        Toast.makeText(getApplicationContext(),msn,Toast.LENGTH_LONG).show();
     }
 }
